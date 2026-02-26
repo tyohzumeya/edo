@@ -16,6 +16,7 @@ body {
     border-radius: 5px;
     display: inline-flex;
     align-items: center;
+    z-index: 10; /* 他の要素よりも前面に表示 */
 }
 
 #loop-toggle {
@@ -31,6 +32,7 @@ body {
     background: #f7f7f7;
     position: fixed;
     height: 100%;
+    z-index: 1; /* サイドバーのz-indexを設定 */
 }
 
 #content {
@@ -49,6 +51,7 @@ body {
     text-align: left;
     cursor: pointer;
     font-size: 16px;
+    list-style-type: none;  /* リストのデフォルトの丸印を消す */
 }
 
 .menu-item:hover {
@@ -83,4 +86,25 @@ body {
 label {
     font-size: 14px;
     margin-right: 5px;
+}
+
+/* リスト内アイテムのスタイル */
+ul {
+    padding: 0; /* リスト全体のパディングをリセット */
+    margin: 0; /* マージンもリセット */
+}
+
+li {
+    padding-left: 10px;
+    font-size: 16px;
+    list-style-type: none; /* デフォルトのリストマーカーを削除 */
+}
+
+/* 親アイテムと子アイテムのスタイル */
+li > .menu-item {
+    font-weight: bold;
+}
+
+li > .submenu {
+    padding-left: 20px;
 }
