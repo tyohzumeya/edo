@@ -3,7 +3,6 @@ body {
     font-family sans-serif;
     display flex;
     height 100vh;
-    background: red !important;
 }
 
 #sidebar {
@@ -21,6 +20,7 @@ body {
 }
 
 .menu-item {
+    all: unset;         /* 標準スタイルをリセット */
     display block;
     width 100%;
     padding 6px;
