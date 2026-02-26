@@ -2,9 +2,19 @@ let treeData = [];
 let audioData = {};
 let activeBtn = null;
 let currentAudio = null;
+let isLooping = false;  // ループ設定を管理する変数
 
 const sidebar = document.getElementById("sidebar");
 const content = document.getElementById("content");
+
+// ループ切替スイッチの初期化
+const loopToggle = document.getElementById("loop-toggle");
+loopToggle.addEventListener('change', () => {
+    isLooping = loopToggle.checked;  // ループ状態を更新
+    if (currentAudio) {
+        currentAudio.loop = isLooping;  // 音声のループ設定を変更
+    }
+});
 
 /* ===== 初期化 ===== */
 async function init() {
@@ -136,6 +146,7 @@ function showAudio(id) {
                 currentAudio = null;
             } else {
                 currentAudio = new Audio(item.file);
+                currentAudio.loop = isLooping;  // ループ設定を適用
                 currentAudio.play();
                 currentAudio.onended = () => currentAudio = null;
             }

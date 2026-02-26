@@ -1,21 +1,45 @@
+/* 基本的なスタイル */
 body {
-    display: flex;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
 }
 
+/* 左上に表示されるループ切替トグルスイッチ */
+#controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+#loop-toggle {
+    margin-left: 10px;
+}
+
+/* サイドバーのスタイル */
 #sidebar {
     width: 280px;
     border-right: 1px solid #ccc;
     overflow-y: auto;
     padding: 10px;
     background: #f7f7f7;
+    position: fixed;
+    height: 100%;
 }
 
 #content {
-    flex-grow: 1;
-    overflow-y: auto;
+    margin-left: 300px;  /* サイドバー分の余白 */
     padding: 20px;
+    overflow-y: auto;
 }
 
+/* メニューアイテムのスタイル */
 .menu-item {
     display: block;
     width: 100%;
@@ -35,6 +59,7 @@ body {
     background: #cce5ff;
 }
 
+/* サブメニューのアニメーション */
 .submenu {
     margin-left: 15px;
     overflow: hidden;
@@ -46,8 +71,16 @@ body {
     max-height: 1000px;
 }
 
+/* 音声ボタン */
 .audio-btn {
     padding: 8px;
     margin: 5px;
     cursor: pointer;
+    font-size: 14px;
+}
+
+/* トグルスイッチのラベル */
+label {
+    font-size: 14px;
+    margin-right: 5px;
 }
