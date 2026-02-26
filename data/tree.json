@@ -1,0 +1,15 @@
+[
+  {
+    "title": "動物",
+    "children": [
+      { "id": "dog", "title": "犬" },
+      { "id": "cat", "title": "猫" }
+    ]
+  },
+  {
+    "title": "自然",
+    "children": [
+      { "id": "rain", "title": "雨" }
+    ]
+  }
+]

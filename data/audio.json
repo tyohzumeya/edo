@@ -1,0 +1,11 @@
+{
+  "dog": [
+    { "title": "犬の鳴き声", "file": "audio/dog.mp3" }
+  ],
+  "cat": [
+    { "title": "猫の鳴き声", "file": "audio/cat.mp3" }
+  ],
+  "rain": [
+    { "title": "雨音", "file": "audio/rain.mp3" }
+  ]
+}
