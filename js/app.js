@@ -14,6 +14,9 @@ loopToggle.addEventListener('change', () => {
     if (currentAudio) {
         currentAudio.loop = isLooping;  // 音声のループ設定を変更
     }
+
+    // トグルスイッチの表示更新
+    loopToggle.classList.toggle('checked', isLooping);
 });
 
 /* ===== 初期化 ===== */
