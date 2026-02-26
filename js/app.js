@@ -8,10 +8,17 @@ const content = document.getElementById("content");
 
 /* ===== 初期化 ===== */
 async function init() {
-    treeData = await fetch("data/tree.json").then(r => r.json());
-    audioData = await fetch("data/audio.json").then(r => r.json());
+    try {
+        // データの非同期取得
+        treeData = await fetch("data/tree.json").then(r => r.json());
+        audioData = await fetch("data/audio.json").then(r => r.json());
+    } catch (error) {
+        console.error("データの読み込みに失敗しました", error);
+    }
 
+    // localStorage から状態復元
     loadState();
+    // ツリーを描画
     renderTree(treeData, sidebar);
 }
 init();
@@ -19,19 +26,16 @@ init();
 /* ===== ツリー描画 ===== */
 function renderTree(nodes, parent, path = []) {
     nodes.forEach((node, index) => {
-
         const btn = document.createElement("button");
         btn.className = "menu-item";
         btn.textContent = node.title;
         btn.draggable = true;
 
         const currentPath = [...path, index];
-
         btn.dataset.path = JSON.stringify(currentPath);
-
         parent.appendChild(btn);
 
-        /* ドラッグ */
+        /* ドラッグ操作 */
         btn.ondragstart = e => {
             e.dataTransfer.setData("text/plain", btn.dataset.path);
         };
@@ -47,21 +51,25 @@ function renderTree(nodes, parent, path = []) {
             refresh();
         };
 
+        /* 子要素があれば再帰的に描画 */
         if (node.children) {
             const submenu = document.createElement("div");
             submenu.className = "submenu";
             parent.appendChild(submenu);
 
+            // 展開状態の設定
             btn.onclick = () => {
                 submenu.classList.toggle("open");
+                node.open = submenu.classList.contains("open");
                 saveState();
             };
 
+            // 展開状態を復元
             if (node.open) submenu.classList.add("open");
 
             renderTree(node.children, submenu, currentPath);
-
         } else {
+            // 音声ボタン
             btn.onclick = () => {
                 activate(btn);
                 showAudio(node.id);
