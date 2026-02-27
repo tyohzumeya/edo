@@ -1,15 +1,18 @@
-[
-  {
-    "title": "ぶいすぽ",
-    "children": [
-      { "id": "sumi", "title": "すみー" },
-      { "id": "cat", "title": "猫" }
-    ]
-  },
-  {
-    "title": "自然",
-    "children": [
-      { "id": "rain", "title": "雨" }
-    ]
-  }
-]
+{
+  "version": "1.0",
+  "data": [
+    {
+      "title": "ぶいすぽ",
+      "children": [
+        { "id": "sumi", "title": "すみー" },
+        { "id": "cat", "title": "猫" }
+      ]
+    },
+    {
+      "title": "自然",
+      "children": [
+        { "id": "rain", "title": "雨" }
+      ]
+    }
+  ]
+}
