@@ -45,26 +45,38 @@ init();
    マスターとマージ
 ========================= */
 function mergeWithMaster(master, saved) {
-    const map = new Map(saved.map(n => [n.id, n]));
 
-    return master.map(masterNode => {
-        const savedNode = map.get(masterNode.id);
+    const masterMap = new Map(master.map(n => [n.id, n]));
+    const savedMap  = new Map(saved.map(n => [n.id, n]));
+
+    const result = [];
+
+    // ① 保存順を優先
+    for (const savedNode of saved) {
+        const masterNode = masterMap.get(savedNode.id);
+        if (!masterNode) continue; // マスターにない → 削除
 
         const newNode = structuredClone(masterNode);
+        newNode.open = savedNode.open;
 
-        if (savedNode) {
-            newNode.open = savedNode.open;
-
-            if (masterNode.children) {
-                newNode.children = mergeWithMaster(
-                    masterNode.children,
-                    savedNode.children || []
-                );
-            }
+        if (masterNode.children) {
+            newNode.children = mergeWithMaster(
+                masterNode.children,
+                savedNode.children || []
+            );
         }
 
-        return newNode;
-    });
+        result.push(newNode);
+    }
+
+    // ② マスターにあって保存にないものは最後尾追加
+    for (const masterNode of master) {
+        if (!savedMap.has(masterNode.id)) {
+            result.push(structuredClone(masterNode));
+        }
+    }
+
+    return result;
 }
 
 /* =========================
