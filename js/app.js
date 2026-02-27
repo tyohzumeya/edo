@@ -12,7 +12,7 @@ const content = document.getElementById("content");
 const loopToggle = document.getElementById("loop-toggle");
 
 /* =========================
-   ループ
+   ループトグル（JSは音声ループ制御のみ）
 ========================= */
 loopToggle.addEventListener("change", () => {
     isLooping = loopToggle.checked;
@@ -30,7 +30,6 @@ async function init() {
     audioData = await fetch("data/audio.json").then(r => r.json());
 
     const saved = loadSavedTree();
-
     if (saved) {
         treeData = mergeWithMaster(masterData, saved);
     } else {
@@ -42,16 +41,15 @@ async function init() {
 init();
 
 /* =========================
-   マスターとマージ
+   マスターと保存データをマージ（順番保持）
 ========================= */
 function mergeWithMaster(master, saved) {
-
     const masterMap = new Map(master.map(n => [n.id, n]));
     const savedMap  = new Map(saved.map(n => [n.id, n]));
 
     const result = [];
 
-    // ① 保存順を優先
+    // 保存順を優先
     for (const savedNode of saved) {
         const masterNode = masterMap.get(savedNode.id);
         if (!masterNode) continue; // マスターにない → 削除
@@ -69,7 +67,7 @@ function mergeWithMaster(master, saved) {
         result.push(newNode);
     }
 
-    // ② マスターにあって保存にないものは最後尾追加
+    // マスターにあって保存にないものは最後尾に追加
     for (const masterNode of master) {
         if (!savedMap.has(masterNode.id)) {
             result.push(structuredClone(masterNode));
@@ -80,15 +78,12 @@ function mergeWithMaster(master, saved) {
 }
 
 /* =========================
-   保存
+   localStorage 保存/読み込み
 ========================= */
 function saveTree() {
     localStorage.setItem("treeSaved", JSON.stringify(treeData));
 }
 
-/* =========================
-   読み込み
-========================= */
 function loadSavedTree() {
     const saved = localStorage.getItem("treeSaved");
     if (!saved) return null;
@@ -96,7 +91,7 @@ function loadSavedTree() {
 }
 
 /* =========================
-   ツリー描画
+   ツリー描画（子要素に画像表示）
 ========================= */
 function renderTree(nodes, parent, path = []) {
     nodes.forEach((node, index) => {
@@ -109,13 +104,19 @@ function renderTree(nodes, parent, path = []) {
         btn.dataset.path = JSON.stringify(currentPath);
         parent.appendChild(btn);
 
-        /* ドラッグ */
+        // 画像表示（images/{id}.png）
+        const img = document.createElement("img");
+        img.src = `images/${node.id}.png`;
+        img.alt = node.title;
+        img.style.width = "30px";
+        img.style.marginRight = "5px";
+        btn.prepend(img);
+
+        /* ドラッグ&ドロップ */
         btn.ondragstart = e => {
             e.dataTransfer.setData("text/plain", btn.dataset.path);
         };
-
         btn.ondragover = e => e.preventDefault();
-
         btn.ondrop = e => {
             e.preventDefault();
             const fromPath = JSON.parse(e.dataTransfer.getData("text/plain"));
@@ -148,7 +149,7 @@ function renderTree(nodes, parent, path = []) {
 }
 
 /* =========================
-   並び替え
+   並び替え関数
 ========================= */
 function reorder(data, fromPath, toPath) {
     const fromParent = getParent(data, fromPath);
@@ -172,7 +173,7 @@ function getParent(data, path) {
 }
 
 /* =========================
-   音声
+   音声表示
 ========================= */
 function showAudio(id) {
     content.innerHTML = "";
@@ -199,7 +200,9 @@ function showAudio(id) {
     });
 }
 
-/* ========================= */
+/* =========================
+   アクティブ表示
+========================= */
 function activate(btn) {
     if (activeBtn) activeBtn.classList.remove("active");
     btn.classList.add("active");
