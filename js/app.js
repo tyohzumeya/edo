@@ -1,8 +1,7 @@
+// ===== グローバル変数 =====
 let treeData = [];
 let masterData = [];
 let audioData = {};
-let treeVersion = "";
-
 let activeBtn = null;
 let currentAudio = null;
 let isLooping = false;
@@ -13,46 +12,44 @@ const loopToggle = document.getElementById("loop-toggle");
 const speedSlider = document.getElementById("speed-slider");
 const speedValue = document.getElementById("speed-value");
 
-/* ===== ループトグル ===== */
+// ===== ループトグル =====
 loopToggle.addEventListener("change", () => {
     isLooping = loopToggle.checked;
     if (currentAudio) currentAudio.loop = isLooping;
 });
 
-/* ===== 再生速度スライダー ===== */
+// ===== 再生速度スライダー =====
 speedSlider.addEventListener("input", () => {
     const speed = parseFloat(speedSlider.value);
     speedValue.textContent = speed + "x";
-
     if (currentAudio) currentAudio.playbackRate = speed;
 });
 
-/* ===== 初期化 ===== */
+// ===== 初期化 =====
 async function init() {
+    // JSON 読み込み
     const treeJson = await fetch("data/tree.json").then(r => r.json());
-    treeVersion = treeJson.version;
     masterData = treeJson.data;
 
     audioData = await fetch("data/audio.json").then(r => r.json());
 
+    // 保存データの読み込み
     const saved = loadSavedTree();
-    if (saved) {
-        treeData = mergeWithMaster(masterData, saved);
-    } else {
-        treeData = structuredClone(masterData);
-    }
+    treeData = saved ? mergeWithMaster(masterData, saved) : structuredClone(masterData);
 
-    renderTree(treeData, sidebar);
+    // スライダー初期表示更新
+    const speed = parseFloat(speedSlider.value);
+    speedValue.textContent = speed + "x";
 }
-init();
 
-/* ===== マスターと保存データをマージ ===== */
+// ===== マスターと保存データをマージ =====
 function mergeWithMaster(master, saved) {
     const masterMap = new Map(master.map(n => [n.id, n]));
-    const savedMap  = new Map(saved.map(n => [n.id, n]));
+    const savedMap = new Map(saved.map(n => [n.id, n]));
 
     const result = [];
 
+    // 保存データ順にマスターをマージ
     for (const savedNode of saved) {
         const masterNode = masterMap.get(savedNode.id);
         if (!masterNode) continue;
@@ -61,36 +58,31 @@ function mergeWithMaster(master, saved) {
         newNode.open = savedNode.open;
 
         if (masterNode.children) {
-            newNode.children = mergeWithMaster(
-                masterNode.children,
-                savedNode.children || []
-            );
+            newNode.children = mergeWithMaster(masterNode.children, savedNode.children || []);
         }
 
         result.push(newNode);
     }
 
+    // マスターにあって保存にないものを追加
     for (const masterNode of master) {
-        if (!savedMap.has(masterNode.id)) {
-            result.push(structuredClone(masterNode));
-        }
+        if (!savedMap.has(masterNode.id)) result.push(structuredClone(masterNode));
     }
 
     return result;
 }
 
-/* ===== localStorage ===== */
+// ===== localStorage =====
 function saveTree() {
     localStorage.setItem("treeSaved", JSON.stringify(treeData));
 }
 
 function loadSavedTree() {
     const saved = localStorage.getItem("treeSaved");
-    if (!saved) return null;
-    return JSON.parse(saved);
+    return saved ? JSON.parse(saved) : null;
 }
 
-/* ===== ツリー描画 ===== */
+// ===== ツリー描画 =====
 function renderTree(nodes, parent, path = []) {
     nodes.forEach((node, index) => {
         const btn = document.createElement("button");
@@ -102,19 +94,18 @@ function renderTree(nodes, parent, path = []) {
         btn.dataset.path = JSON.stringify(currentPath);
         parent.appendChild(btn);
 
-        // 子要素だけ画像追加
-        if (!node.children) {
+        // 子要素のみ画像追加
+        if (!node.children && node.id) {
             const img = document.createElement("img");
-            img.src = `images/${node.id}.png`;
+            img.src = `images/${node.id}.png`; // PNG対応
             img.alt = node.title;
             img.classList.add("tree-icon");
+            img.onerror = () => img.remove();
             btn.prepend(img);
         }
 
-        /* ドラッグ&ドロップ */
-        btn.ondragstart = e => {
-            e.dataTransfer.setData("text/plain", btn.dataset.path);
-        };
+        // ===== ドラッグ＆ドロップ =====
+        btn.ondragstart = e => e.dataTransfer.setData("text/plain", btn.dataset.path);
         btn.ondragover = e => e.preventDefault();
         btn.ondrop = e => {
             e.preventDefault();
@@ -124,6 +115,7 @@ function renderTree(nodes, parent, path = []) {
             refresh();
         };
 
+        // ===== 子要素がある場合 =====
         if (node.children) {
             const submenu = document.createElement("div");
             submenu.className = "submenu";
@@ -139,6 +131,7 @@ function renderTree(nodes, parent, path = []) {
 
             renderTree(node.children, submenu, currentPath);
         } else {
+            // ===== 子要素ボタン（音声用） =====
             btn.onclick = () => {
                 activate(btn);
                 showAudio(node.id);
@@ -147,11 +140,10 @@ function renderTree(nodes, parent, path = []) {
     });
 }
 
-/* ===== 並び替え ===== */
+// ===== 並び替え =====
 function reorder(data, fromPath, toPath) {
     const fromParent = getParent(data, fromPath);
     const toParent = getParent(data, toPath);
-
     if (fromParent !== toParent) return;
 
     const fromIndex = fromPath.at(-1);
@@ -161,16 +153,14 @@ function reorder(data, fromPath, toPath) {
     fromParent.splice(toIndex, 0, moved);
 }
 
-/* ===== 親取得 ===== */
+// ===== 親取得 =====
 function getParent(data, path) {
     let ref = data;
-    for (let i = 0; i < path.length - 1; i++) {
-        ref = ref[path[i]].children;
-    }
+    for (let i = 0; i < path.length - 1; i++) ref = ref[path[i]].children;
     return ref;
 }
 
-/* ===== 音声表示 ===== */
+// ===== 音声表示 =====
 function showAudio(id) {
     content.innerHTML = "";
     const list = audioData[id] || [];
@@ -197,24 +187,18 @@ function showAudio(id) {
     });
 }
 
-/* ===== アクティブ表示 ===== */
+// ===== アクティブ表示 =====
 function activate(btn) {
     if (activeBtn) activeBtn.classList.remove("active");
     btn.classList.add("active");
     activeBtn = btn;
 }
 
+// ===== 再描画 =====
 function refresh() {
     sidebar.innerHTML = "";
     renderTree(treeData, sidebar);
 }
 
-function initSlider() {
-    const speed = parseFloat(speedSlider.value);
-    speedValue.textContent = speed + "x";
-}
-
-// init() の最後で呼び出す
-init().then(() => {
-    initSlider();
-});
+// ===== 初期化呼び出し =====
+init().then(() => refresh());
