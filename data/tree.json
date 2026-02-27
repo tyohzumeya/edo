@@ -10,10 +10,10 @@
       ]
     },
     {
-      "id": "nature",
-      "title": "自然",
+      "id": "holo",
+      "title": "ホロ",
       "children": [
-        { "id": "rain", "title": "雨" }
+        { "id": "korone", "title": "ころね" }
       ]
     }
   ]
