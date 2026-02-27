@@ -105,7 +105,7 @@ function renderTree(nodes, parent, path = []) {
         // 子要素だけ画像追加
         if (!node.children) {
             const img = document.createElement("img");
-            img.src = `images/${node.id}.jpg`;
+            img.src = `images/${node.id}.png`;
             img.alt = node.title;
             img.classList.add("tree-icon");
             btn.prepend(img);
