@@ -21,6 +21,8 @@ body {
 
 #loop-toggle-container {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 /* スライド式トグルスイッチ */

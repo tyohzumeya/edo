@@ -1,6 +1,7 @@
 {
-  "dog": [
-    { "title": "犬の鳴き声", "file": "audio/dog.mp3" }
+  "sumi": [
+    { "title": "アン", "file": "audio/すみー/an.wav" },
+    { "title": "んっ", "file": "audio/すみー/n.wav" }
   ],
   "cat": [
     { "title": "猫の鳴き声", "file": "audio/cat.mp3" }

@@ -1,8 +1,8 @@
 [
   {
-    "title": "動物",
+    "title": "ぶいすぽ",
     "children": [
-      { "id": "dog", "title": "犬" },
+      { "id": "sumi", "title": "すみー" },
       { "id": "cat", "title": "猫" }
     ]
   },
