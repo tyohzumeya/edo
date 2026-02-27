@@ -3,8 +3,8 @@
     { "title": "アン", "file": "audio/すみー/an.wav" },
     { "title": "んっ", "file": "audio/すみー/n.wav" }
   ],
-  "cat": [
-    { "title": "猫の鳴き声", "file": "audio/cat.mp3" }
+  "akarin": [
+    { "title": "イーグイグイグイグ", "file": "audio/あかりん/igu.wav" }
   ],
   "rain": [
     { "title": "雨音", "file": "audio/rain.mp3" }
