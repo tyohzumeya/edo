@@ -25,7 +25,7 @@ body {
     align-items: center;
 }
 
-/* スライド式トグルスイッチ */
+/* トグル本体 */
 #loop-toggle {
     -webkit-appearance: none;
     appearance: none;
@@ -38,7 +38,8 @@ body {
     transition: background-color 0.3s ease;
 }
 
-#loop-toggle:before {
+/* スライドする丸 */
+#loop-toggle::before {
     content: "";
     position: absolute;
     top: 3px;
@@ -50,11 +51,12 @@ body {
     transition: transform 0.3s ease;
 }
 
-#loop-toggle.checked {
+/* チェック時 */
+#loop-toggle:checked {
     background-color: #4CAF50;
 }
 
-#loop-toggle.checked:before {
+#loop-toggle:checked::before {
     transform: translateX(25px);
 }
 
