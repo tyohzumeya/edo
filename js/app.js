@@ -208,3 +208,13 @@ function refresh() {
     sidebar.innerHTML = "";
     renderTree(treeData, sidebar);
 }
+
+function initSlider() {
+    const speed = parseFloat(speedSlider.value);
+    speedValue.textContent = speed + "x";
+}
+
+// init() の最後で呼び出す
+init().then(() => {
+    initSlider();
+});
