@@ -12,38 +12,76 @@ const content = document.getElementById("content");
 const loopToggle = document.getElementById("loop-toggle");
 
 /* =========================
-   ループ切替
+   ループ
 ========================= */
 loopToggle.addEventListener("change", () => {
     isLooping = loopToggle.checked;
     if (currentAudio) currentAudio.loop = isLooping;
-    loopToggle.classList.toggle("checked", isLooping);
 });
 
 /* =========================
-   初期化（マスター優先方式）
+   初期化
 ========================= */
 async function init() {
-    try {
-        const treeJson = await fetch("data/tree.json").then(r => r.json());
-        treeVersion = treeJson.version;
-        masterData = treeJson.data;
+    const treeJson = await fetch("data/tree.json").then(r => r.json());
+    treeVersion = treeJson.version;
+    masterData = treeJson.data;
 
-        audioData = await fetch("data/audio.json").then(r => r.json());
+    audioData = await fetch("data/audio.json").then(r => r.json());
 
-        // マスターをコピー
+    const saved = loadSavedTree();
+
+    if (saved) {
+        treeData = mergeWithMaster(masterData, saved);
+    } else {
         treeData = structuredClone(masterData);
-
-        // UI状態だけ復元
-        loadUIState();
-
-    } catch (error) {
-        console.error("データ読み込み失敗", error);
     }
 
     renderTree(treeData, sidebar);
 }
 init();
+
+/* =========================
+   マスターとマージ
+========================= */
+function mergeWithMaster(master, saved) {
+    const map = new Map(saved.map(n => [n.id, n]));
+
+    return master.map(masterNode => {
+        const savedNode = map.get(masterNode.id);
+
+        const newNode = structuredClone(masterNode);
+
+        if (savedNode) {
+            newNode.open = savedNode.open;
+
+            if (masterNode.children) {
+                newNode.children = mergeWithMaster(
+                    masterNode.children,
+                    savedNode.children || []
+                );
+            }
+        }
+
+        return newNode;
+    });
+}
+
+/* =========================
+   保存
+========================= */
+function saveTree() {
+    localStorage.setItem("treeSaved", JSON.stringify(treeData));
+}
+
+/* =========================
+   読み込み
+========================= */
+function loadSavedTree() {
+    const saved = localStorage.getItem("treeSaved");
+    if (!saved) return null;
+    return JSON.parse(saved);
+}
 
 /* =========================
    ツリー描画
@@ -53,9 +91,26 @@ function renderTree(nodes, parent, path = []) {
         const btn = document.createElement("button");
         btn.className = "menu-item";
         btn.textContent = node.title;
+        btn.draggable = true;
 
         const currentPath = [...path, index];
+        btn.dataset.path = JSON.stringify(currentPath);
         parent.appendChild(btn);
+
+        /* ドラッグ */
+        btn.ondragstart = e => {
+            e.dataTransfer.setData("text/plain", btn.dataset.path);
+        };
+
+        btn.ondragover = e => e.preventDefault();
+
+        btn.ondrop = e => {
+            e.preventDefault();
+            const fromPath = JSON.parse(e.dataTransfer.getData("text/plain"));
+            reorder(treeData, fromPath, currentPath);
+            saveTree();
+            refresh();
+        };
 
         if (node.children) {
             const submenu = document.createElement("div");
@@ -65,7 +120,7 @@ function renderTree(nodes, parent, path = []) {
             btn.onclick = () => {
                 submenu.classList.toggle("open");
                 node.open = submenu.classList.contains("open");
-                saveUIState();
+                saveTree();
             };
 
             if (node.open) submenu.classList.add("open");
@@ -81,7 +136,31 @@ function renderTree(nodes, parent, path = []) {
 }
 
 /* =========================
-   音声表示
+   並び替え
+========================= */
+function reorder(data, fromPath, toPath) {
+    const fromParent = getParent(data, fromPath);
+    const toParent = getParent(data, toPath);
+
+    if (fromParent !== toParent) return;
+
+    const fromIndex = fromPath.at(-1);
+    const toIndex = toPath.at(-1);
+
+    const moved = fromParent.splice(fromIndex, 1)[0];
+    fromParent.splice(toIndex, 0, moved);
+}
+
+function getParent(data, path) {
+    let ref = data;
+    for (let i = 0; i < path.length - 1; i++) {
+        ref = ref[path[i]].children;
+    }
+    return ref;
+}
+
+/* =========================
+   音声
 ========================= */
 function showAudio(id) {
     content.innerHTML = "";
@@ -98,7 +177,6 @@ function showAudio(id) {
                 currentAudio = null;
                 return;
             }
-
             currentAudio = new Audio(item.file);
             currentAudio.loop = isLooping;
             currentAudio.play();
@@ -109,67 +187,14 @@ function showAudio(id) {
     });
 }
 
-/* =========================
-   アクティブ表示
-========================= */
+/* ========================= */
 function activate(btn) {
     if (activeBtn) activeBtn.classList.remove("active");
     btn.classList.add("active");
     activeBtn = btn;
 }
 
-/* =========================
-   UI状態保存（開閉のみ）
-========================= */
-function saveUIState() {
-    const state = {
-        version: treeVersion,
-        openState: extractOpenState(treeData)
-    };
-    localStorage.setItem("treeUIState", JSON.stringify(state));
-}
-
-/* =========================
-   UI状態読込
-========================= */
-function loadUIState() {
-    const saved = localStorage.getItem("treeUIState");
-    if (!saved) return;
-
-    const parsed = JSON.parse(saved);
-
-    // バージョン違いなら破棄
-    if (parsed.version !== treeVersion) {
-        localStorage.removeItem("treeUIState");
-        return;
-    }
-
-    applyOpenState(treeData, parsed.openState);
-}
-
-/* =========================
-   開閉状態抽出
-========================= */
-function extractOpenState(nodes) {
-    return nodes.map(node => ({
-        open: node.open || false,
-        children: node.children ? extractOpenState(node.children) : null
-    }));
-}
-
-/* =========================
-   開閉状態適用
-========================= */
-function applyOpenState(nodes, state) {
-    if (!state) return;
-
-    nodes.forEach((node, i) => {
-        if (!state[i]) return;
-
-        node.open = state[i].open;
-
-        if (node.children && state[i].children) {
-            applyOpenState(node.children, state[i].children);
-        }
-    });
+function refresh() {
+    sidebar.innerHTML = "";
+    renderTree(treeData, sidebar);
 }

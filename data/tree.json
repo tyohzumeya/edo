@@ -2,6 +2,7 @@
   "version": "1.0",
   "data": [
     {
+      "id": "vspo",
       "title": "ぶいすぽ",
       "children": [
         { "id": "sumi", "title": "すみー" },
@@ -9,6 +10,7 @@
       ]
     },
     {
+      "id": "nature",
       "title": "自然",
       "children": [
         { "id": "rain", "title": "雨" }
