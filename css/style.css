@@ -1,4 +1,3 @@
-/* 基本的なスタイル */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -6,26 +5,24 @@ body {
     background-color: #f7f7f7;
 }
 
-/* 左上に表示されるループ切替トグルスイッチ */
 #controls {
     position: absolute;
     top: 10px;
     left: 10px;
     background-color: rgba(255, 255, 255, 0.8);
-    padding: 5px;
+    padding: 10px;
     border-radius: 5px;
-    display: inline-flex;  /* 横並びにする */
-    align-items: center;   /* 縦位置を中央に */
-    z-index: 10;           /* 他の要素よりも前面に表示 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 10;
 }
 
 #loop-toggle-container {
-    position: relative;
     display: flex;
     align-items: center;
 }
 
-/* トグル本体 */
 #loop-toggle {
     -webkit-appearance: none;
     appearance: none;
@@ -38,7 +35,6 @@ body {
     transition: background-color 0.3s ease;
 }
 
-/* スライドする丸 */
 #loop-toggle::before {
     content: "";
     position: absolute;
@@ -51,7 +47,6 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* チェック時 */
 #loop-toggle:checked {
     background-color: #4CAF50;
 }
@@ -60,13 +55,21 @@ body {
     transform: translateX(25px);
 }
 
-/* ラベルのスタイル */
-#controls label {
-    font-size: 14px;
-    margin-right: 10px;  /* トグルとの間隔を調整 */
+#speed-slider-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
 }
 
-/* サイドバーのスタイル */
+#speed-slider {
+    margin-left: 5px;
+}
+
+#speed-value {
+    margin-left: 8px;
+    font-weight: bold;
+}
+
 #sidebar {
     width: 280px;
     border-right: 1px solid #ccc;
@@ -75,16 +78,15 @@ body {
     background: #f7f7f7;
     position: fixed;
     height: 100%;
-    top: 50px; /* トグルの下にリストをずらす */
+    top: 80px; /* controls分ずらす */
 }
 
 #content {
-    margin-left: 300px;  /* サイドバー分の余白 */
+    margin-left: 300px;
     padding: 20px;
     overflow-y: auto;
 }
 
-/* メニューアイテムのスタイル */
 .menu-item {
     display: block;
     width: 100%;
@@ -94,7 +96,6 @@ body {
     text-align: left;
     cursor: pointer;
     font-size: 16px;
-    list-style-type: none;  /* リストのデフォルトの丸印を消す */
 }
 
 .menu-item:hover {
@@ -105,7 +106,6 @@ body {
     background: #cce5ff;
 }
 
-/* サブメニューのアニメーション */
 .submenu {
     margin-left: 15px;
     overflow: hidden;
@@ -117,7 +117,6 @@ body {
     max-height: 1000px;
 }
 
-/* 音声ボタン */
 .audio-btn {
     padding: 8px;
     margin: 5px;
@@ -125,23 +124,9 @@ body {
     font-size: 14px;
 }
 
-/* リスト内アイテムのスタイル */
-ul {
-    padding: 0; /* リスト全体のパディングをリセット */
-    margin: 0; /* マージンもリセット */
-}
-
-li {
-    padding-left: 10px;
-    font-size: 16px;
-    list-style-type: none; /* デフォルトのリストマーカーを削除 */
-}
-
-/* 親アイテムと子アイテムのスタイル */
-li > .menu-item {
-    font-weight: bold;
-}
-
-li > .submenu {
-    padding-left: 20px;
+img.tree-icon {
+    width: 30px;
+    height: auto;
+    margin-right: 5px;
+    vertical-align: middle;
 }

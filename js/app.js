@@ -10,18 +10,24 @@ let isLooping = false;
 const sidebar = document.getElementById("sidebar");
 const content = document.getElementById("content");
 const loopToggle = document.getElementById("loop-toggle");
+const speedSlider = document.getElementById("speed-slider");
+const speedValue = document.getElementById("speed-value");
 
-/* =========================
-   ループトグル（JSは音声ループ制御のみ）
-========================= */
+/* ===== ループトグル ===== */
 loopToggle.addEventListener("change", () => {
     isLooping = loopToggle.checked;
     if (currentAudio) currentAudio.loop = isLooping;
 });
 
-/* =========================
-   初期化
-========================= */
+/* ===== 再生速度スライダー ===== */
+speedSlider.addEventListener("input", () => {
+    const speed = parseFloat(speedSlider.value);
+    speedValue.textContent = speed + "x";
+
+    if (currentAudio) currentAudio.playbackRate = speed;
+});
+
+/* ===== 初期化 ===== */
 async function init() {
     const treeJson = await fetch("data/tree.json").then(r => r.json());
     treeVersion = treeJson.version;
@@ -40,19 +46,16 @@ async function init() {
 }
 init();
 
-/* =========================
-   マスターと保存データをマージ（順番保持）
-========================= */
+/* ===== マスターと保存データをマージ ===== */
 function mergeWithMaster(master, saved) {
     const masterMap = new Map(master.map(n => [n.id, n]));
     const savedMap  = new Map(saved.map(n => [n.id, n]));
 
     const result = [];
 
-    // 保存順を優先
     for (const savedNode of saved) {
         const masterNode = masterMap.get(savedNode.id);
-        if (!masterNode) continue; // マスターにない → 削除
+        if (!masterNode) continue;
 
         const newNode = structuredClone(masterNode);
         newNode.open = savedNode.open;
@@ -67,7 +70,6 @@ function mergeWithMaster(master, saved) {
         result.push(newNode);
     }
 
-    // マスターにあって保存にないものは最後尾に追加
     for (const masterNode of master) {
         if (!savedMap.has(masterNode.id)) {
             result.push(structuredClone(masterNode));
@@ -77,9 +79,7 @@ function mergeWithMaster(master, saved) {
     return result;
 }
 
-/* =========================
-   localStorage 保存/読み込み
-========================= */
+/* ===== localStorage ===== */
 function saveTree() {
     localStorage.setItem("treeSaved", JSON.stringify(treeData));
 }
@@ -90,9 +90,7 @@ function loadSavedTree() {
     return JSON.parse(saved);
 }
 
-/* =========================
-   ツリー描画（子要素に画像表示）
-========================= */
+/* ===== ツリー描画 ===== */
 function renderTree(nodes, parent, path = []) {
     nodes.forEach((node, index) => {
         const btn = document.createElement("button");
@@ -104,13 +102,12 @@ function renderTree(nodes, parent, path = []) {
         btn.dataset.path = JSON.stringify(currentPath);
         parent.appendChild(btn);
 
+        // 子要素だけ画像追加
         if (!node.children) {
-            // 画像表示（images/{id}.png）
             const img = document.createElement("img");
-            img.src = `images/${node.id}.png`;
+            img.src = `images/${node.id}.jpg`;
             img.alt = node.title;
-            img.style.width = "30px";
-            img.style.marginRight = "5px";
+            img.classList.add("tree-icon");
             btn.prepend(img);
         }
 
@@ -150,9 +147,7 @@ function renderTree(nodes, parent, path = []) {
     });
 }
 
-/* =========================
-   並び替え関数
-========================= */
+/* ===== 並び替え ===== */
 function reorder(data, fromPath, toPath) {
     const fromParent = getParent(data, fromPath);
     const toParent = getParent(data, toPath);
@@ -166,6 +161,7 @@ function reorder(data, fromPath, toPath) {
     fromParent.splice(toIndex, 0, moved);
 }
 
+/* ===== 親取得 ===== */
 function getParent(data, path) {
     let ref = data;
     for (let i = 0; i < path.length - 1; i++) {
@@ -174,9 +170,7 @@ function getParent(data, path) {
     return ref;
 }
 
-/* =========================
-   音声表示
-========================= */
+/* ===== 音声表示 ===== */
 function showAudio(id) {
     content.innerHTML = "";
     const list = audioData[id] || [];
@@ -194,6 +188,7 @@ function showAudio(id) {
             }
             currentAudio = new Audio(item.file);
             currentAudio.loop = isLooping;
+            currentAudio.playbackRate = parseFloat(speedSlider.value);
             currentAudio.play();
             currentAudio.onended = () => currentAudio = null;
         };
@@ -202,9 +197,7 @@ function showAudio(id) {
     });
 }
 
-/* =========================
-   アクティブ表示
-========================= */
+/* ===== アクティブ表示 ===== */
 function activate(btn) {
     if (activeBtn) activeBtn.classList.remove("active");
     btn.classList.add("active");
