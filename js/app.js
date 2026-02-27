@@ -16,6 +16,7 @@ const speedValue = document.getElementById("speed-value");
 loopToggle.addEventListener("change", () => {
     isLooping = loopToggle.checked;
     if (currentAudio) currentAudio.loop = isLooping;
+    localStorage.setItem("loopState", isLooping); // 保存
 });
 
 // ===== 再生速度スライダー =====
@@ -23,6 +24,7 @@ speedSlider.addEventListener("input", () => {
     const speed = parseFloat(speedSlider.value);
     speedValue.textContent = speed + "x";
     if (currentAudio) currentAudio.playbackRate = speed;
+    localStorage.setItem("speedValue", speed); // 保存
 });
 
 // ===== 初期化 =====
@@ -37,9 +39,17 @@ async function init() {
     const saved = loadSavedTree();
     treeData = saved ? mergeWithMaster(masterData, saved) : structuredClone(masterData);
 
-    // スライダー初期表示更新
-    const speed = parseFloat(speedSlider.value);
-    speedValue.textContent = speed + "x";
+    // スライダー初期表示
+    const savedSpeed = localStorage.getItem("speedValue");
+    if (savedSpeed) {
+        speedSlider.value = savedSpeed;
+    }
+    speedValue.textContent = parseFloat(speedSlider.value) + "x";
+
+    // ループ初期化
+    const savedLoop = localStorage.getItem("loopState");
+    isLooping = savedLoop === "true";
+    loopToggle.checked = isLooping;
 }
 
 // ===== マスターと保存データをマージ =====
@@ -77,6 +87,7 @@ function saveTree() {
     localStorage.setItem("treeSaved", JSON.stringify(treeData));
 }
 
+// ===== 保存データの読み込み =====
 function loadSavedTree() {
     const saved = localStorage.getItem("treeSaved");
     return saved ? JSON.parse(saved) : null;
