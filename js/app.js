@@ -104,13 +104,15 @@ function renderTree(nodes, parent, path = []) {
         btn.dataset.path = JSON.stringify(currentPath);
         parent.appendChild(btn);
 
-        // 画像表示（images/{id}.png）
-        const img = document.createElement("img");
-        img.src = `images/${node.id}.png`;
-        img.alt = node.title;
-        img.style.width = "30px";
-        img.style.marginRight = "5px";
-        btn.prepend(img);
+        if (!node.children) {
+            // 画像表示（images/{id}.png）
+            const img = document.createElement("img");
+            img.src = `images/${node.id}.png`;
+            img.alt = node.title;
+            img.style.width = "30px";
+            img.style.marginRight = "5px";
+            btn.prepend(img);
+        }
 
         /* ドラッグ&ドロップ */
         btn.ondragstart = e => {
