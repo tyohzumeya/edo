@@ -234,24 +234,34 @@ async function playAudio(file){
     });
 }
 
-document.getElementById("play-queue").onclick=async ()=>{
-    if(isPlayingQueue||queue.length===0) return;
-    stopRequested=false;
-    isPlayingQueue=true;
+document.getElementById("play-queue").onclick = async () => {
+    if (isPlayingQueue || queue.length === 0) return;
+
+    stopRequested = false; // 停止リクエストは初期化
+    isPlayingQueue = true;
+
     do {
-        for(let item of queue){
-            if(stopRequested) break;
+        for (let item of queue) {
+            if (stopRequested) break;
             await playAudio(item.file);
-            if(stopRequested) break;
-            if(item.delay>0) await new Promise(r=>setTimeout(r,item.delay*1000));
+            if (stopRequested) break;
+            if (item.delay > 0) await new Promise(r => setTimeout(r, item.delay * 1000));
         }
-    } while(loopToggle.checked&&!stopRequested);
-    isPlayingQueue=false;
+    } while (loopToggle.checked && !stopRequested);
+
+    // 再生終了 or 停止時にフラグリセット
+    isPlayingQueue = false;
+    currentAudio = null;
+    stopRequested = false;
 };
 
-document.getElementById("stop-queue").onclick=()=>{
-    stopRequested=true;
-    if(currentAudio) currentAudio.pause();
+document.getElementById("stop-queue").onclick = () => {
+    stopRequested = true;
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null; // 音声オブジェクトもリセット
+    }
+    isPlayingQueue = false; // 追加: 停止時フラグリセット
 };
 
 document.getElementById("clear-queue").onclick=()=>{
