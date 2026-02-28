@@ -21,15 +21,12 @@ const speedValue = document.getElementById("speed-value");
 
 // ===== 初期化 =====
 async function init() {
-    // JSON読み込み
     masterData = (await fetch("data/tree.json").then(r=>r.json())).data;
     audioData = await fetch("data/audio.json").then(r=>r.json());
 
-    // 保存データ
     const saved = loadSavedTree();
     treeData = saved ? mergeWithMaster(masterData,saved) : structuredClone(masterData);
 
-    // ループ初期値 localStorage優先
     const savedLoop = localStorage.getItem("loopState");
     isLooping = savedLoop !== null ? savedLoop === "true" : false;
     loopToggle.checked = isLooping;
@@ -39,7 +36,6 @@ async function init() {
     volumeSlider.value = currentVolume;
     volumeValue.textContent = currentVolume.toFixed(2);
 
-    // 速度
     const savedSpeed = localStorage.getItem("speedValue");
     currentSpeed = savedSpeed !== null ? parseFloat(savedSpeed) : 1;
     speedSlider.value = currentSpeed;
