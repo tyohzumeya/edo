@@ -228,15 +228,32 @@ function renderQueue() {
         const li = document.createElement("li");
         li.draggable = true;
 
-        li.innerHTML = `
-            <span>${item.title}</span>
-            <input type="number" value="${item.delay}" min="0" step="0.5" style="width:60px">秒
-        `;
+        const span = document.createElement("span");
+        span.textContent = item.title;
 
-        li.querySelector("input").onchange = e => {
+        const delayInput = document.createElement("input");
+        delayInput.type = "number";
+        delayInput.min = 0;
+        delayInput.step = 0.1;
+        delayInput.value = item.delay;
+        delayInput.style.width = "60px";
+        delayInput.onchange = e => {
             item.delay = parseFloat(e.target.value) || 0;
             saveQueue();
         };
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "削除";
+        delBtn.className = "queue-del-btn";
+        delBtn.onclick = () => {
+            queue.splice(index, 1);
+            saveQueue();
+            renderQueue();
+        };
+
+        li.appendChild(span);
+        li.appendChild(delayInput);
+        li.appendChild(delBtn);
 
         li.ondragstart = e => e.dataTransfer.setData("text/plain", index);
         li.ondragover = e => e.preventDefault();
@@ -268,7 +285,7 @@ async function playAudio(file) {
         currentAudio = new Audio(file);
         currentAudio.volume = parseFloat(volumeSlider.value);
         currentAudio.playbackRate = parseFloat(speedSlider.value);
-        currentAudio.loop = false;
+        currentAudio.loop = isLooping;
         currentAudio.play();
         currentAudio.onended = () => { currentAudio = null; resolve(); };
     });
@@ -283,8 +300,7 @@ document.getElementById("play-queue").onclick = async () => {
         if (stopRequested) break;
         await playAudio(item.file);
         if (stopRequested) break;
-        if (item.delay > 0)
-            await new Promise(r => setTimeout(r, item.delay * 1000));
+        if (item.delay > 0) await new Promise(r => setTimeout(r, item.delay * 1000));
     }
 
     isPlayingQueue = false;
@@ -391,5 +407,5 @@ function bufferToWave(abuffer, len) {
     return new Blob([buffer], { type: "audio/wav" });
 }
 
-// ===== 初期化呼び出し =====
+// ===== 初期化 =====
 init();
