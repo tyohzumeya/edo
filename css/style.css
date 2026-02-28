@@ -24,7 +24,7 @@ body {
 }
 
 #right-panel {
-    width: 420px; /* 幅拡張 */
+    width: 420px;
     border-left: 1px solid #ccc;
     background: #fff;
     padding: 10px;
@@ -114,25 +114,25 @@ body {
 
 #queue-container h3 { margin: 0 0 5px 0; font-size: 15px; }
 
-/* ヘッダとリストを同じ flex 配分に揃える */
+/* ヘッダとリストを左寄せ */
 #queue-header, #queue-list li {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
 /* 列幅指定と整列 */
 #queue-header span, #queue-list li span, #queue-list li input, #queue-list li button {
-    text-align: center;
-    margin-right: 4px; /* 列間余白 */
-    white-space: nowrap; /* 折り返さない */
+    text-align: left;
+    margin-right: 4px;
+    white-space: nowrap;
 }
 
 /* 各列の幅 */
 #queue-header .col-title, #queue-list li .col-title { width: 50%; text-align: left; padding-left: 4px; }
-#queue-header .col-delay, #queue-list li .col-delay { width: 16%; }
-#queue-header .col-speed, #queue-list li .col-speed { width: 16%; }
-#queue-header .col-delete, #queue-list li .col-delete { width: 16%; }
+#queue-header .col-delay, #queue-list li .col-delay { width: 16%; text-align: left; }
+#queue-header .col-speed, #queue-list li .col-speed { width: 16%; text-align: left; }
+#queue-header .col-delete, #queue-list li .col-delete { width: 16%; text-align: left; }
 
 /* 入力欄とボタンも幅を揃えつつ余白 */
 #queue-list li input { width: 100%; box-sizing: border-box; margin-right: 2px; }
@@ -140,9 +140,6 @@ body {
 
 /* 各リストアイテム間の余白 */
 #queue-list li { margin-bottom: 3px; padding: 4px; border-bottom: 1px solid #eee; background: #fafafa; }
-
-/* ヘッダの列余白調整 */
-#queue-header span { padding: 2px 2px; }
 
 /* キューボタン */
 #queue-buttons {
