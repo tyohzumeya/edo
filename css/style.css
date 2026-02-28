@@ -5,70 +5,106 @@ body {
     background-color: #f7f7f7;
 }
 
+/* ===== コントロールエリア ===== */
+
 #controls {
     position: absolute;
     top: 10px;
     left: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 5px;
+    width: 260px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 12px;
+    border-radius: 6px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-#loop-toggle-container {
+.control-row {
     display: flex;
     align-items: center;
+    margin-bottom: 8px;
 }
 
-#loop-toggle {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 50px;
-    height: 25px;
-    background-color: #ccc;
-    border-radius: 50px;
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.control-row label {
+    width: 70px;
+    font-size: 14px;
 }
 
-#loop-toggle::before {
-    content: "";
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 19px;
-    height: 19px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
+.control-row input[type="range"] {
+    flex: 1;
 }
 
-#loop-toggle:checked {
-    background-color: #4CAF50;
-}
-
-#loop-toggle:checked::before {
-    transform: translateX(25px);
-}
-
-#speed-slider-container {
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
-}
-
-#speed-slider {
-    margin-left: 5px;
-}
-
-#speed-value {
-    margin-left: 8px;
+.control-row span {
+    margin-left: 6px;
     font-weight: bold;
 }
+
+/* ===== トグル ===== */
+
+#loop-toggle {
+    width: 40px;
+    height: 20px;
+}
+
+/* ===== キューエリア ===== */
+
+#queue-area {
+    margin-top: 10px;
+    background: #ffffff;
+    border-radius: 5px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#queue-area h3 {
+    margin: 0 0 5px 0;
+    font-size: 15px;
+}
+
+#queue-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#queue-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    cursor: grab;
+    background: #fafafa;
+}
+
+#queue-list li:hover {
+    background: #f0f0f0;
+}
+
+#queue-list input {
+    width: 60px;
+}
+
+#queue-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+#queue-buttons button {
+    flex: 1;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* ===== サイドバー ===== */
 
 #sidebar {
     width: 280px;
@@ -78,8 +114,10 @@ body {
     background: #f7f7f7;
     position: fixed;
     height: 100%;
-    top: 80px; /* controls分ずらす */
+    top: 350px;  /* コントロール＋キュー分下にずらす */
 }
+
+/* ===== 右側コンテンツ ===== */
 
 #content {
     margin-left: 300px;
@@ -87,26 +125,24 @@ body {
     overflow-y: auto;
 }
 
-/* メニューアイテムを flexbox にして画像とテキストを横並びに */
+/* ===== ツリーボタン ===== */
+
 .menu-item {
     display: flex;
-    align-items: center; /* 上下中央揃え */
-    gap: 6px;            /* 画像とテキストの間隔 */
+    align-items: center;
+    gap: 6px;
     padding: 6px;
     border: none;
     background: none;
     text-align: left;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
 }
 
-/* 画像サイズの調整（必要に応じて変更） */
 .menu-item img.tree-icon {
-    width: 24px;  /* 好きなサイズに調整 */
+    width: 24px;
     height: 24px;
     object-fit: contain;
-    margin-right: 5px;
-    vertical-align: middle;
 }
 
 .menu-item:hover {
@@ -116,6 +152,8 @@ body {
 .menu-item.active {
     background: #cce5ff;
 }
+
+/* ===== サブメニュー ===== */
 
 .submenu {
     margin-left: 15px;
@@ -128,9 +166,11 @@ body {
     max-height: 1000px;
 }
 
+/* ===== 右側音声ボタン ===== */
+
 .audio-btn {
-    padding: 8px;
-    margin: 5px;
+    padding: 8px 12px;
+    margin: 6px;
     cursor: pointer;
     font-size: 14px;
 }

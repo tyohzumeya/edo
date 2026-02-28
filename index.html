@@ -8,16 +8,36 @@
 <body>
 
 <div id="controls">
-    <div id="loop-toggle-container">
-        <label for="loop-toggle">ループ:</label>
+
+    <div class="control-row">
+        <label>ループ:</label>
         <input type="checkbox" id="loop-toggle">
     </div>
 
-    <div id="speed-slider-container">
-        <label for="speed-slider">再生速度:</label>
+    <div class="control-row">
+        <label>再生速度:</label>
         <input type="range" id="speed-slider" min="0.5" max="2" step="0.05" value="1">
         <span id="speed-value">1x</span>
     </div>
+
+    <div class="control-row">
+        <label>音量:</label>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
+        <span id="volume-value">100%</span>
+    </div>
+
+    <div id="queue-area">
+        <h3>キュー</h3>
+        <ul id="queue-list"></ul>
+
+        <div id="queue-buttons">
+            <button id="play-queue">再生</button>
+            <button id="stop-queue">停止</button>
+            <button id="clear-queue">クリア</button>
+            <button id="export-queue">WAV書き出し</button>
+        </div>
+    </div>
+
 </div>
 
 <div id="sidebar"></div>
