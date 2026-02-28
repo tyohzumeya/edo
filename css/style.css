@@ -24,7 +24,7 @@ body {
 }
 
 #right-panel {
-    width: 280px;
+    width: 340px; /* 幅拡張 */
     border-left: 1px solid #ccc;
     background: #fff;
     padding: 10px;
@@ -113,6 +113,24 @@ body {
 }
 
 #queue-container h3 { margin: 0 0 5px 0; font-size: 15px; }
+
+#queue-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    padding: 4px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#queue-header span {
+    display: inline-block;
+    text-align: center;
+}
+
+.col-title { width: 50%; text-align: left; padding-left: 4px; }
+.col-delay, .col-speed, .col-delete { width: 16%; }
+
+/* リスト */
 #queue-list { list-style: none; padding: 0; margin: 0; }
 
 #queue-list li {
@@ -127,8 +145,9 @@ body {
 }
 
 #queue-list li:hover { background: #f0f0f0; }
-#queue-list input { width: 60px; }
-.queue-del-btn { margin-left: 6px; cursor: pointer; }
+
+#queue-list input { width: 50px; }
+.queue-del-btn { margin-left: 4px; cursor: pointer; }
 
 /* キューボタン */
 #queue-buttons {

@@ -12,90 +12,68 @@ let stopRequested = false;
 const sidebar = document.getElementById("sidebar");
 const content = document.getElementById("content");
 const loopToggle = document.getElementById("loop-toggle");
-const speedSlider = document.getElementById("speed-slider");
-const speedValue = document.getElementById("speed-value");
 const volumeSlider = document.getElementById("volume-slider");
 const volumeValue = document.getElementById("volume-value");
 const queueList = document.getElementById("queue-list");
 
 // ===== localStorage =====
-function saveTree() {
-    localStorage.setItem("treeSaved", JSON.stringify(treeData));
-}
-function loadSavedTree() {
-    const saved = localStorage.getItem("treeSaved");
-    return saved ? JSON.parse(saved) : null;
-}
+function saveTree() { localStorage.setItem("treeSaved", JSON.stringify(treeData)); }
+function loadSavedTree() { const saved = localStorage.getItem("treeSaved"); return saved? JSON.parse(saved): null; }
 function saveQueue() { localStorage.setItem("audioQueue", JSON.stringify(queue)); }
-function loadQueue() {
-    const saved = localStorage.getItem("audioQueue");
-    if (saved) queue = JSON.parse(saved);
-}
+function loadQueue() { const saved = localStorage.getItem("audioQueue"); if(saved) queue = JSON.parse(saved); }
 
 // ===== マスターと保存マージ =====
-function mergeWithMaster(master, saved) {
+function mergeWithMaster(master, saved){
     const masterMap = new Map(master.map(n=>[n.id,n]));
     const savedMap = new Map(saved.map(n=>[n.id,n]));
-    const result = [];
-
-    for (const savedNode of saved) {
+    const result=[];
+    for(const savedNode of saved){
         const masterNode = masterMap.get(savedNode.id);
-        if (!masterNode) continue;
+        if(!masterNode) continue;
         const newNode = structuredClone(masterNode);
         newNode.open = savedNode.open;
-        if (masterNode.children) newNode.children = mergeWithMaster(masterNode.children, savedNode.children || []);
+        if(masterNode.children) newNode.children = mergeWithMaster(masterNode.children, savedNode.children||[]);
         result.push(newNode);
     }
-    for (const masterNode of master) {
-        if (!savedMap.has(masterNode.id)) result.push(structuredClone(masterNode));
+    for(const masterNode of master){
+        if(!savedMap.has(masterNode.id)) result.push(structuredClone(masterNode));
     }
     return result;
 }
 
 // ===== 初期化 =====
-async function init() {
+async function init(){
     const treeJson = await fetch("data/tree.json").then(r=>r.json());
     masterData = treeJson.data;
     audioData = await fetch("data/audio.json").then(r=>r.json());
 
     const saved = loadSavedTree();
-    treeData = saved ? mergeWithMaster(masterData, saved) : structuredClone(masterData);
-
-    const savedSpeed = localStorage.getItem("speedValue");
-    if (savedSpeed) speedSlider.value = savedSpeed;
-    speedValue.textContent = speedSlider.value+"x";
+    treeData = saved? mergeWithMaster(masterData,saved) : structuredClone(masterData);
 
     const savedVolume = localStorage.getItem("volumeValue");
-    if (savedVolume) volumeSlider.value = savedVolume;
-    volumeValue.textContent = Math.round(volumeSlider.value*100)+"%";
+    if(savedVolume) volumeSlider.value=savedVolume;
+    volumeValue.textContent=Math.round(volumeSlider.value*100)+"%";
 
-    loopToggle.checked = true;
+    loopToggle.checked=true;
 
     loadQueue();
     renderQueue();
     refresh();
 }
 
-// ===== ループ・速度・音量 =====
-loopToggle.addEventListener("change", () => {
-    // ループはキュー全体に適用
-});
-speedSlider.addEventListener("input", ()=>{
-    const speed=parseFloat(speedSlider.value);
-    speedValue.textContent=speed+"x";
-});
+// ===== ループ・音量 =====
+loopToggle.addEventListener("change", ()=>{ /* キュー単位で使用 */ });
 volumeSlider.addEventListener("input", ()=>{
     volumeValue.textContent=Math.round(volumeSlider.value*100)+"%";
 });
 
 // ===== ツリー描画 =====
-function renderTree(nodes, parent=sidebar, path=[]) {
+function renderTree(nodes,parent=sidebar,path=[]){
     nodes.forEach((node,index)=>{
         const btn=document.createElement("button");
         btn.className="menu-item";
         btn.textContent=node.title;
         btn.draggable=true;
-
         const currentPath=[...path,index];
         btn.dataset.path=JSON.stringify(currentPath);
         parent.appendChild(btn);
@@ -137,7 +115,7 @@ function renderTree(nodes, parent=sidebar, path=[]) {
     });
 }
 
-function reorder(data, fromPath, toPath){
+function reorder(data,fromPath,toPath){
     const fromParent=getParent(data,fromPath);
     const toParent=getParent(data,toPath);
     if(fromParent!==toParent) return;
@@ -174,14 +152,11 @@ function activate(btn){
 }
 
 // ===== 再描画 =====
-function refresh(){
-    sidebar.innerHTML="";
-    renderTree(treeData,sidebar);
-}
+function refresh(){ sidebar.innerHTML=""; renderTree(treeData,sidebar); }
 
 // ===== キュー操作 =====
 function addToQueue(title,file){
-    queue.push({title,file,delay:0});
+    queue.push({title,file,delay:0,speed:1});
     saveQueue();
     renderQueue();
 }
@@ -196,9 +171,12 @@ function renderQueue(){
         span.textContent=item.title;
 
         const delayInput=document.createElement("input");
-        delayInput.type="number";
-        delayInput.min=0; delayInput.step=0.1; delayInput.value=item.delay;
+        delayInput.type="number"; delayInput.min=0; delayInput.step=0.1; delayInput.value=item.delay;
         delayInput.onchange=e=>{ item.delay=parseFloat(e.target.value)||0; saveQueue(); };
+
+        const speedInput=document.createElement("input");
+        speedInput.type="number"; speedInput.min=0.5; speedInput.max=2; speedInput.step=0.05; speedInput.value=item.speed;
+        speedInput.onchange=e=>{ item.speed=parseFloat(e.target.value)||1; saveQueue(); };
 
         const delBtn=document.createElement("button");
         delBtn.textContent="削除"; delBtn.className="queue-del-btn";
@@ -206,6 +184,7 @@ function renderQueue(){
 
         li.appendChild(span);
         li.appendChild(delayInput);
+        li.appendChild(speedInput);
         li.appendChild(delBtn);
 
         li.ondragstart=e=>e.dataTransfer.setData("text/plain",index);
@@ -224,50 +203,43 @@ function renderQueue(){
 }
 
 // ===== キュー再生 =====
-async function playAudio(file){
+async function playAudio(file,speed){
     return new Promise(resolve=>{
         currentAudio=new Audio(file);
         currentAudio.volume=parseFloat(volumeSlider.value);
-        currentAudio.playbackRate=parseFloat(speedSlider.value);
+        currentAudio.playbackRate=speed;
         currentAudio.play();
         currentAudio.onended=()=>{ currentAudio=null; resolve(); };
     });
 }
 
-document.getElementById("play-queue").onclick = async () => {
-    if (isPlayingQueue || queue.length === 0) return;
-
-    stopRequested = false; // 停止リクエストは初期化
-    isPlayingQueue = true;
+document.getElementById("play-queue").onclick=async ()=>{
+    if(isPlayingQueue || queue.length===0) return;
+    stopRequested=false;
+    isPlayingQueue=true;
 
     do {
-        for (let item of queue) {
-            if (stopRequested) break;
-            await playAudio(item.file);
-            if (stopRequested) break;
-            if (item.delay > 0) await new Promise(r => setTimeout(r, item.delay * 1000));
+        for(let item of queue){
+            if(stopRequested) break;
+            await playAudio(item.file,item.speed);
+            if(stopRequested) break;
+            if(item.delay>0) await new Promise(r=>setTimeout(r,item.delay*1000));
         }
-    } while (loopToggle.checked && !stopRequested);
+    } while(loopToggle.checked && !stopRequested);
 
-    // 再生終了 or 停止時にフラグリセット
-    isPlayingQueue = false;
-    currentAudio = null;
-    stopRequested = false;
+    isPlayingQueue=false;
+    currentAudio=null;
+    stopRequested=false;
 };
 
-document.getElementById("stop-queue").onclick = () => {
-    stopRequested = true;
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null; // 音声オブジェクトもリセット
-    }
-    isPlayingQueue = false; // 追加: 停止時フラグリセット
+document.getElementById("stop-queue").onclick=()=>{
+    stopRequested=true;
+    if(currentAudio){ currentAudio.pause(); currentAudio=null; }
+    isPlayingQueue=false;
 };
 
 document.getElementById("clear-queue").onclick=()=>{
-    queue=[];
-    saveQueue();
-    renderQueue();
+    queue=[]; saveQueue(); renderQueue();
 };
 
 // ===== WAV書き出し =====
@@ -278,7 +250,6 @@ document.getElementById("export-queue").onclick=async ()=>{
 
     const audioContext=new (window.AudioContext||window.webkitAudioContext)();
     const buffers=[];
-
     for(let item of queue){
         const response=await fetch(item.file);
         const arrayBuffer=await response.arrayBuffer();
@@ -315,7 +286,6 @@ document.getElementById("export-queue").onclick=async ()=>{
     URL.revokeObjectURL(url);
 };
 
-// ===== WAV変換 =====
 function bufferToWave(abuffer,len){
     const numOfChan=abuffer.numberOfChannels;
     const length=len*numOfChan*2+44;
