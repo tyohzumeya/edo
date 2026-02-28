@@ -15,6 +15,30 @@ function loadSavedTree(){ const s=localStorage.getItem("treeSaved"); return s?JS
 function saveQueue(){ localStorage.setItem("audioQueue",JSON.stringify(queue)); }
 function loadQueue(){ const s=localStorage.getItem("audioQueue"); if(s) queue=JSON.parse(s); }
 
+function saveControls() {
+    const controlsState = {
+        loop: document.getElementById('loop-toggle').checked,
+        volume: parseFloat(document.getElementById('volume-slider').value)
+    };
+    localStorage.setItem("controlsState", JSON.stringify(controlsState));
+}
+
+function loadControls() {
+    const s = localStorage.getItem("controlsState");
+    
+    if (s) {
+        const state = JSON.parse(s);
+        loopCheckbox.checked = !!state.loop;
+        volumeSlider.value = state.volume;
+        volumeValue.textContent = Math.round(state.volume * 100) + '%';
+    } else {
+        // 初期値設定
+        loopCheckbox.checked = false;
+        volumeSlider.value = 1;
+        volumeValue.textContent = '100%';
+    }
+}
+
 // ===== マスターと保存マージ =====
 function mergeWithMaster(master,saved){
     const masterMap=new Map(master.map(n=>[n.id,n]));
@@ -292,6 +316,16 @@ function bufferToWave(abuffer,len){
     }
     return new Blob([buffer],{type:"audio/wav"});
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadControls(); // ページ読み込み時に復元
+    // 変更時に localStorage に保存
+    loopCheckbox.addEventListener('change', saveControls);
+    volumeSlider.addEventListener('input', () => {
+        volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
+        saveControls();
+    });
+});
 
 // ===== 初期化 =====
 init();
