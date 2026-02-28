@@ -63,20 +63,19 @@ async function init(){
     const saved=loadSavedTree();
     treeData=saved?mergeWithMaster(masterData,saved):structuredClone(masterData);
 
-    const savedVol=localStorage.getItem("volumeValue");
-    if(savedVol) volumeSlider.value=savedVol;
-    volumeValue.textContent=Math.round(volumeSlider.value*100)+"%";
-
-    loopToggle.checked=false;
-
+    loadControls();
     loadQueue();
     renderQueue();
     refresh();
 }
 
+// 変更時に localStorage に保存
+loopToggle.addEventListener('change', saveControls);
+
 // ===== 音量 =====
 volumeSlider.addEventListener("input",()=>{
     volumeValue.textContent=Math.round(volumeSlider.value*100)+"%";
+    saveControls();
 });
 
 // ===== ツリー描画 =====
@@ -316,16 +315,6 @@ function bufferToWave(abuffer,len){
     }
     return new Blob([buffer],{type:"audio/wav"});
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadControls(); // ページ読み込み時に復元
-    // 変更時に localStorage に保存
-    loopToggle.addEventListener('change', saveControls);
-    volumeSlider.addEventListener('input', () => {
-        volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
-        saveControls();
-    });
-});
 
 // ===== 初期化 =====
 init();
