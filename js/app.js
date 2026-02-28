@@ -28,12 +28,12 @@ function loadControls() {
     
     if (s) {
         const state = JSON.parse(s);
-        loopCheckbox.checked = !!state.loop;
+        loopToggle.checked = !!state.loop;
         volumeSlider.value = state.volume;
         volumeValue.textContent = Math.round(state.volume * 100) + '%';
     } else {
         // 初期値設定
-        loopCheckbox.checked = false;
+        loopToggle.checked = false;
         volumeSlider.value = 1;
         volumeValue.textContent = '100%';
     }
@@ -320,7 +320,7 @@ function bufferToWave(abuffer,len){
 document.addEventListener('DOMContentLoaded', () => {
     loadControls(); // ページ読み込み時に復元
     // 変更時に localStorage に保存
-    loopCheckbox.addEventListener('change', saveControls);
+    loopToggle.addEventListener('change', saveControls);
     volumeSlider.addEventListener('input', () => {
         volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
         saveControls();
