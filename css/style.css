@@ -134,6 +134,7 @@ body {
 #queue-header .col-speed, #queue-list li .col-speed { width: 16%; }
 #queue-header .col-delete, #queue-list li .col-delete { width: 16%; }
 
+#queue-list { padding-left: 0px; }
 /* 入力欄とボタンも幅を揃えつつ余白 */
 #queue-list li input { width: 100%; box-sizing: border-box; margin-right: 2px; }
 #queue-list li button { width: 100%; box-sizing: border-box; }

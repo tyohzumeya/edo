@@ -43,7 +43,7 @@ async function init(){
     if(savedVol) volumeSlider.value=savedVol;
     volumeValue.textContent=Math.round(volumeSlider.value*100)+"%";
 
-    loopToggle.checked=true;
+    loopToggle.checked=false;
 
     loadQueue();
     renderQueue();
