@@ -1,55 +1,51 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Tree Audio UI</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Tree Audio UI</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="left-panel">
     <div id="controls">
         <div class="control-row">
-            <label for="loop-toggle">ループ:</label>
+            <label>ループ:</label>
             <input type="checkbox" id="loop-toggle">
         </div>
-
         <div class="control-row">
-            <label for="speed-slider">再生速度:</label>
-            <input type="range" id="speed-slider" min="0.1" max="2" step="0.1" value="1">
-            <span id="speed-value">1x</span>
-        </div>
-
-        <div class="control-row">
-            <label for="volume-slider">音量:</label>
+            <label>音量:</label>
             <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">
-            <span id="volume-value">1.00</span>
+            <span id="volume-value">100%</span>
         </div>
     </div>
 
     <div id="sidebar"></div>
 </div>
 
-<div id="center-panel" id="content"></div>
+<div id="center-panel">
+    <div id="content"></div>
+</div>
 
 <div id="right-panel">
     <div id="queue-container">
         <h3>キュー</h3>
         <div id="queue-header">
             <span class="col-title">タイトル</span>
-            <span class="col-delay">ディレイ(s)</span>
+            <span class="col-delay">ディレイ</span>
             <span class="col-speed">速度</span>
             <span class="col-delete">削除</span>
         </div>
         <ul id="queue-list"></ul>
         <div id="queue-buttons">
-            <button id="queue-clear">全クリア</button>
-            <button id="queue-play">再生</button>
-            <button id="queue-stop">停止</button>
+            <button id="play-queue">再生</button>
+            <button id="stop-queue">停止</button>
+            <button id="clear-queue">全削除</button>
+            <button id="export-queue">WAV書き出し</button>
         </div>
     </div>
 </div>
 
-<script src="app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
